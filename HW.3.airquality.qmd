@@ -1,0 +1,65 @@
+---
+title: "Assignment 3"
+author: "Eva Juengling Bean"
+format: pdf
+editor: visual
+---
+
+```{r}
+#| label: load-libraries
+#| echo: true
+#| warning: false
+
+rm(list=ls())
+
+library(tidyverse)
+library(janitor)
+library(here)
+library(ggplot2)
+```
+
+```{r}
+#| label: make-data
+#| echo: true
+#| warnings: false
+
+day <- seq(1,365, by=1)
+pm25 <- runif(n=length(day), min=1, max=50)
+
+data <- data.frame(day,pm25)
+data$season <- as.factor(ifelse(data$day<=90, "winter", ifelse(data$day>270, "fall", ifelse(data$day>180, "summer", "spring"))))
+data$risk <- NA
+```
+
+```{r}
+#| label: looping
+#| echo: true
+#| warnings: false
+
+good.thresh <- 12
+mod.thresh <- 35.4
+data$max.unhealthy.streak <- 0
+
+data$risk[1] <- ifelse(data$pm25[1]<=good.thresh, "good", ifelse(data$pm25>mod.thresh, "unhealthy", "moderate"))
+
+for (i in 2:length(day)){
+  if (data$pm25[i] <= good.thresh){
+    data$risk[i]="good"
+  } else if (data$pm25[i]<= mod.thresh){
+    data$risk[i]="moderate"
+  } else{
+    data$risk[i]="unhealthy"
+  }
+  if (data$risk[i]=="unhealthy"){
+    data$max.unhealthy.streak[i]=data$max.unhealthy.streak[i-1]+ifelse(data$risk[i]=="unhealthy",1,0)
+  }
+}
+
+```
+
+
+
+
+
+
+
