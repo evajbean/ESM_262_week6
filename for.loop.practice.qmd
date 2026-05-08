@@ -1,0 +1,130 @@
+---
+title: "Week 6"
+format: html
+editor: visual
+---
+
+```{r}
+#| label: libraries
+#| echo: false
+#| warning: false
+
+library(tidyverse)
+library(janitor)
+library(here)
+library(ggplot2)
+
+```
+
+```{r}
+a <- 0
+
+for (i in 1:5){
+  a=a+i
+}
+
+a
+
+#initialize to 0
+
+av <- rep(x=0,times=5)
+
+
+# fill data structure
+
+for (i in 1:length(av)){
+  if (i==1){
+    av[i]=1
+  }
+  else{
+    av[i]=av[i-1]+i
+  }
+}
+
+av
+
+```
+
+```{r}
+#| label: practice
+
+# test mean for loop
+
+test.no <- runif(min=0,max=20,n=100)
+
+total <- 0
+n <- 100
+
+for (i in 1:n){
+  total=test.no[i]+total
+}
+
+total/n
+
+mean(test.no)
+
+```
+
+```{r}
+#| label: cost-benefit
+
+income <- runif(min=1000, max=5000, n=10)
+income
+
+expenses <- rnorm(mean=1500, sd=500, n=10)
+expenses <- ifelse(expenses<0, 0, expenses)
+
+expenses
+
+accounts <- data.frame(income, expenses)
+accounts$year <- seq(from=2000, length.out=nrow(accounts))
+
+accounts <- accounts |>
+  mutate(net=income-expenses)
+
+# for loop
+accounts$netloop <- NA
+
+for (n in 1:10){
+  accounts$netloop[n] = accounts$income[n]-accounts$expenses[n]
+}
+
+accounts$net
+accounts$netloop
+
+# carry forward for loop
+
+accounts$carryforward.net <- 0
+accounts$carryforward.net[1]=accounts$net[1]
+
+for (n in 2:10){
+  accounts$carryforward.net[n]=accounts$net[n]+accounts$carryforward.net[n-1]
+}
+
+ggplot(accounts, aes(x=year, y=carryforward.net, fill=net, group=year))+
+  geom_col()
+```
+```{r}
+#| label: adding-complexity
+
+speeds <- runif(min=0, max=50, n=300)
+
+hunting.speed <- 35
+social.speed <- 5
+
+num.hunting.speeds <- 0
+num.social.speeds <- 0
+
+for (i in 1:length(speeds)){
+  num.hunting.speeds = num.hunting.speeds + ifelse(speeds[i]>= hunting.speed, 1,0)
+  num.social.speeds = num.social.speeds + ifelse(speeds[i]<social.speed, 1,0)
+}
+
+num.hunting.speeds
+num.social.speeds
+
+num.traveling.speed <- length(speeds) - num.hunting.speeds - num.social.speeds
+
+num.traveling.speed
+```
+
