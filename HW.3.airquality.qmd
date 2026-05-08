@@ -58,7 +58,31 @@ for (i in 2:length(day)){
 ```
 
 
+```{r}
+#| label: season-summary
+#| echo: true
+#| warnings: false
 
+winter.total <- 0
+spring.total <- 0
+summer.total <- 0
+fall.total <- 0
+
+
+for (i in 1:length(day)){
+  if (data$season[i]=="winter" && data$risk[i]=="unhealthy"){
+    winter.total = winter.total+1
+  } else if (data$season[i]=="spring" && data$risk[i]=="unhealthy"){
+    spring.total = spring.total+1
+  } else if (data$season[i]=="summer"&& data$risk[i]=="unhealthy"){
+    summer.total = summer.total+1
+  } else if (data$risk[i]=="unhealthy"){
+    fall.total = fall.total+1
+  }
+}
+
+season.summary <- data.frame(winter.total, spring.total, summer.total, fall.total)
+```
 
 
 
