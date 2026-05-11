@@ -59,6 +59,8 @@ for (i in 2:length(day)){
   max.unhealthy.streak=max(data$unhealthy.streak)
 }
 
+data$risk <- as.factor(data$risk)
+
 ```
 
 
@@ -89,19 +91,34 @@ season.summary <- data.frame(winter.total, spring.total, summer.total, fall.tota
 ```
 
 ```{r}
-#| label: plot
+#| label: plot-pm25
 #| echo: true
 #| warnings: false
 
+data$season <- factor(data$season, levels=c("winter", "spring", "summer", "fall"))
+
 pm25.trend.plot <- ggplot(data, aes(y=pm25, x=day, color=season))+
   geom_line()+
+  labs(title=sprintf("The longest consecutive streak of unhealthy air quality was %s days", max.unhealthy.streak), x="Day", y="PM 2.5 Concentration", color="Season")+
+  scale_color_discrete(labels=c("Winter", "Spring", "Summer", "Fall"))+
   theme_bw()
 
 pm25.trend.plot
+```
 
-category.count <- ggplot(data, aes(x=risk))+
+```{r}
+#| label: plot-category
+#| echo: true
+#| warnings: false
+
+season.labels <- as_labeller(c("fall"="Fall", "spring"="Spring", "winter"="Winter", "summer"="Summer"))
+
+category.count <- ggplot(data, aes(x=risk, fill=risk))+
   geom_bar()+
-  facet_wrap(data$season)+
+  facet_wrap(~season, labeller=labeller(season=season.labels))+
+  scale_fill_manual(labels=c("Good", "Moderate","Unhealthy"), values=c("darkgreen", "gold", "red"))+
+  labs(title=sprintf("The longest consecutive streak of unhealthy air quality was %s days", max.unhealthy.streak), x="Air Quality", y="Number of Observed Days", fill="Air Quality")+
+  scale_x_discrete(labels=NULL, breaks=NULL)+
   theme_bw()
 
 category.count
