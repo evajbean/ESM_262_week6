@@ -1,13 +1,14 @@
 ---
 title: "Assignment 3"
 author: "Eva Juengling Bean"
+date: 5/12/2026
 format: pdf
 editor: visual
 ---
 
 ```{r}
 #| label: load-libraries
-#| echo: true
+#| echo: false
 #| warnings: false
 #| message: false
 
@@ -19,6 +20,7 @@ library(here)
 library(ggplot2)
 ```
 
+*Step 1:* Make the data
 ```{r}
 #| label: make-data
 #| echo: true
@@ -29,10 +31,14 @@ day <- seq(1,365, by=1)
 pm25 <- runif(n=length(day), min=1, max=50)
 
 data <- data.frame(day,pm25)
-data$season <- as.factor(ifelse(data$day<=90, "winter", ifelse(data$day>270, "fall", ifelse(data$day>180, "summer", "spring"))))
+data$season <- as.factor(ifelse(data$day<=90, "winter", 
+                                ifelse(data$day>270, "fall", 
+                                       ifelse(data$day>180, "summer", 
+                                              "spring"))))
 data$risk <- NA
 ```
 
+*Step 2:* Qualify Risk and Calculate the Maximum Unhealthy Streak
 ```{r}
 #| label: looping
 #| echo: true
@@ -43,7 +49,8 @@ mod.thresh <- 35.4
 data$unhealthy.streak <- 0
 max.unhealthy.streak <- 0
 
-data$risk[1] <- ifelse(data$pm25[1]<=good.thresh, "good", ifelse(data$pm25>mod.thresh, "unhealthy", "moderate"))
+data$risk[1] <- ifelse(data$pm25[1]<=good.thresh, "good", 
+                       ifelse(data$pm25>mod.thresh, "unhealthy", "moderate"))
 
 for (i in 2:length(day)){
   if (data$pm25[i] <= good.thresh){
@@ -54,7 +61,8 @@ for (i in 2:length(day)){
     data$risk[i]="unhealthy"
   }
   if (data$risk[i]=="unhealthy"){
-    data$unhealthy.streak[i]=data$unhealthy.streak[i-1]+ifelse(data$risk[i]=="unhealthy",1,0)
+    data$unhealthy.streak[i]=data$unhealthy.streak[i-1]+
+      ifelse(data$risk[i]=="unhealthy",1,0)
   }
   max.unhealthy.streak=max(data$unhealthy.streak)
 }
@@ -63,7 +71,7 @@ data$risk <- as.factor(data$risk)
 
 ```
 
-
+*Step 3:* Season Summary
 ```{r}
 #| label: season-summary
 #| echo: true
@@ -87,20 +95,26 @@ for (i in 1:length(day)){
   }
 }
 
-season.summary <- data.frame(winter.total, spring.total, summer.total, fall.total)
+season.summary <- data.frame(winter.total, spring.total, 
+                             summer.total, fall.total)
 ```
 
+*Step 4:* Plots
 ```{r}
 #| label: plot-pm25
 #| echo: true
 #| warnings: false
 
-data$season <- factor(data$season, levels=c("winter", "spring", "summer", "fall"))
+data$season <- factor(data$season, levels=c("winter", 
+                                            "spring", "summer", "fall"))
 
 pm25.trend.plot <- ggplot(data)+
   geom_line( aes(y=pm25, x=day, color=season))+
-  labs(title=sprintf("The longest consecutive streak of unhealthy air quality was %s days", max.unhealthy.streak), x="Day", y="PM 2.5 Concentration", color="Season")+
+  labs(title=sprintf("The longest consecutive streak of unhealthy air 
+                     quality was %s days", max.unhealthy.streak), 
+       x="Day", y="PM 2.5 Concentration", color="Season")+
   scale_color_discrete(labels=c("Winter", "Spring", "Summer", "Fall"))+
+  theme(plot.title=element_text(size=5))+
   theme_bw()
 
 pm25.trend.plot
@@ -111,14 +125,19 @@ pm25.trend.plot
 #| echo: true
 #| warnings: false
 
-season.labels <- as_labeller(c("fall"="Fall", "spring"="Spring", "winter"="Winter", "summer"="Summer"))
+season.labels <- as_labeller(c("fall"="Fall", "spring"="Spring", 
+                               "winter"="Winter", "summer"="Summer"))
 
 category.count <- ggplot(data, aes(x=risk, fill=risk))+
   geom_bar()+
   facet_wrap(~season, labeller=labeller(season=season.labels))+
-  scale_fill_manual(labels=c("Good", "Moderate","Unhealthy"), values=c("darkgreen", "gold", "red"))+
-  labs(title=sprintf("The longest consecutive streak of unhealthy air quality was %s days", max.unhealthy.streak), x="Air Quality", y="Number of Observed Days", fill="Air Quality")+
+  scale_fill_manual(labels=c("Good", "Moderate","Unhealthy"), 
+                    values=c("darkgreen", "gold", "red"))+
+  labs(title=sprintf("The longest consecutive streak of unhealthy 
+                     air quality was %s days", max.unhealthy.streak), 
+       x="Air Quality", y="Number of Observed Days", fill="Air Quality")+
   scale_x_discrete(labels=NULL, breaks=NULL)+
+  theme(plot.title=element_text(size=5))+
   theme_bw()
 
 category.count
