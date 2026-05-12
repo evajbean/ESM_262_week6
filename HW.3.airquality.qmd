@@ -97,8 +97,8 @@ season.summary <- data.frame(winter.total, spring.total, summer.total, fall.tota
 
 data$season <- factor(data$season, levels=c("winter", "spring", "summer", "fall"))
 
-pm25.trend.plot <- ggplot(data, aes(y=pm25, x=day, color=season))+
-  geom_line()+
+pm25.trend.plot <- ggplot(data)+
+  geom_line( aes(y=pm25, x=day, color=season))+
   labs(title=sprintf("The longest consecutive streak of unhealthy air quality was %s days", max.unhealthy.streak), x="Day", y="PM 2.5 Concentration", color="Season")+
   scale_color_discrete(labels=c("Winter", "Spring", "Summer", "Fall"))+
   theme_bw()
@@ -124,3 +124,4 @@ category.count <- ggplot(data, aes(x=risk, fill=risk))+
 category.count
 
 ```
+From the data, there seem to be limited trends in air quality across seasons, with large spikes and dips seen throughout the year. However, across Winter, Summer, and Fall, there appear to be significantly more days with moderate or unhealthy air quality. Curiously, the amount of good air quality days seems to hold steady around 20-25 days a season across all seasons. This suggests that an investigation into the drivers of such air quality deterioration is necessary, with a potential investment in more stringent air quality regulations or clean air technology.
